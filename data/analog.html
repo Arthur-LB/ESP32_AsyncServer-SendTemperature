@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affichage grandeur analogique méthode simple</title>
+    <style>
+        body{
+            margin: 0;
+            font-family: Verdana, sans-serif;
+        }
+        header{
+            background: #f5f5f5;
+            box-shadow: 0 1px 10px 0 #aaa;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            align-content: center;
+        }
+        h1{
+            color:#888;
+        }
+        footer{
+            width: 100%;
+            font-size:small;
+            background: #f5f5f5;
+            text-align: center;
+            border-top: 1px solid #aaa;
+            position:absolute;
+                bottom: 0;
+        }
+
+        .half-circle {
+            width: 200px;
+            height: 100px;
+            position:relative;
+                left:auto;
+            margin: auto;
+            margin-top: 5%;
+            margin-bottom: 5%;
+            background-color: transparent;
+            border-top-left-radius: 110px;
+            border-top-right-radius: 110px;
+            border: 20px solid #D2B48C;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            border-bottom: 0;
+        }
+        .aiguille {
+            width: 80px;
+            height: 10px;
+            position:absolute;
+                bottom: 0;
+            background-color: #999999;
+            border-top-left-radius: 50%;
+            border-bottom-left-radius: 50%;
+            transform-origin: right;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Récupération valeur analogique avec AJAX</h1>
+    </header>
+
+    <p>Température : <span id="tempText"></span></p>
+    
+    <div class="half-circle">
+        <div class="aiguille" id="aiguilleTempAnalogMetre"></div>
+    </div>
+
+    <p>Luminosité : <span id="lumText"></span></p>
+
+    <div class="half-circle">
+        <div class="aiguille" id="aiguilleLumAnalogMetre"></div>
+    </div>
+
+    <footer>
+        <p>Made by Arthur-Louis Bonneau, Lamia EL KHOUKHI</p>
+    </footer>
+    <script>
+
+        setInterval(getVals, 2000); //1 sec
+        //setInterval(luminositeAnalogique, 1000); //1 sec
+        function getVals() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200){
+                    var val = this.responseText.split("_"); // ready.State égal 4 signifie ‘‘DONE’’, requête traitée
+                    document.getElementById("tempText").innerHTML = ((parseInt(val[0])*3.3/4095 - 0.25)/0.028) + "°C";
+                    document.getElementById("lumText").innerHTML = val[0];
+                    
+
+                    var angleTemp = (parseInt(val[0]) / 4090)*180;
+                    var angleLum = (parseInt(val[1]) / 4090)*180;
+                    document.getElementById("aiguilleLumAnalogMetre").style.transform = 'rotate('+angleLum.toString()+'deg)';
+                    document.getElementById("aiguilleTempAnalogMetre").style.transform = 'rotate('+angleTemp.toString()+'deg)';
+
+                }
+            };
+            xhttp.open("GET", "/getValeurs", true); // XXXXXXXX la requête que le serveur doit executer
+            xhttp.send();
+        }
+    </script>
+</body>
+</html>
